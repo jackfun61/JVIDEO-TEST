@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Video Viewer</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  .video-container { margin-bottom: 30px; }
+  video { width: 100%; max-width: 600px; display: block; margin-bottom: 10px; }
+  .info { margin-bottom: 10px; }
+  button { margin-right: 10px; padding: 5px 10px; }
+</style>
+</head>
+<body>
+
+<h1>My Video Site</h1>
+
+<div id="videos"></div>
+
+<script>
+// Sample JSON data
+const videoData = [
+  {
+    "videoname": "Video test",
+    "filename": "videotest.mp4",
+    "author": "Jvideo",
+    "views": 0,
+    "likes": 0
+  }
+];
+
+// Function to render videos
+function renderVideos() {
+  const container = document.getElementById('videos');
+  container.innerHTML = ''; // clear previous content
+
+  videoData.forEach((video, index) => {
+    const videoDiv = document.createElement('div');
+    videoDiv.classList.add('video-container');
+
+    videoDiv.innerHTML = `
+      <h2>${video.videoname}</h2>
+      <video src="${video.filename}" controls></video>
+      <div class="info">
+        Author: ${video.author} <br>
+        Views: <span id="views-${index}">${video.views}</span> 
+        Likes: <span id="likes-${index}">${video.likes}</span>
+      </div>
+      <button onclick="addView(${index})">Watch Video</button>
+      <button onclick="addLike(${index})">Like</button>
+    `;
+
+    container.appendChild(videoDiv);
+  });
+}
+
+// Functions to update views and likes
+function addView(index) {
+  videoData[index].views++;
+  document.getElementById(`views-${index}`).innerText = videoData[index].views;
+}
+
+function addLike(index) {
+  videoData[index].likes++;
+  document.getElementById(`likes-${index}`).innerText = videoData[index].likes;
+}
+
+// Initial render
+renderVideos();
+</script>
+
+</body>
+</html>
