@@ -30,40 +30,52 @@ const videoData = [
   }
 ];
 
-// Function to render videos
+// Render videos
 function renderVideos() {
   const container = document.getElementById('videos');
-  container.innerHTML = ''; // clear previous content
+  container.innerHTML = '';
 
   videoData.forEach((video, index) => {
     const videoDiv = document.createElement('div');
     videoDiv.classList.add('video-container');
 
+    // Check localStorage for user status
+    const userStatus = JSON.parse(localStorage.getItem(`video-${index}`)) || { viewed: false, liked: false };
+
     videoDiv.innerHTML = `
       <h2>${video.videoname}</h2>
-      <video src="${video.filename}" controls></video>
+      <video id="video-${index}" src="${video.filename}" controls></video>
       <div class="info">
         Author: ${video.author} <br>
-        Views: <span id="views-${index}">${video.views}</span> 
-        Likes: <span id="likes-${index}">${video.likes}</span>
+        Views: <span id="views-${index}">${video.views + (userStatus.viewed ? 1 : 0)}</span> 
+        Likes: <span id="likes-${index}">${video.likes + (userStatus.liked ? 1 : 0)}</span>
       </div>
-      <button onclick="addView(${index})">Watch Video</button>
-      <button onclick="addLike(${index})">Like</button>
+      <button id="like-btn-${index}" ${userStatus.liked ? 'disabled' : ''}>Like</button>
     `;
 
     container.appendChild(videoDiv);
+
+    // Add view when video starts playing (only once per user)
+    const videoEl = document.getElementById(`video-${index}`);
+    videoEl.addEventListener('play', () => {
+      if (!userStatus.viewed) {
+        userStatus.viewed = true;
+        localStorage.setItem(`video-${index}`, JSON.stringify(userStatus));
+        document.getElementById(`views-${index}`).innerText = video.views + 1;
+      }
+    });
+
+    // Like button click
+    const likeBtn = document.getElementById(`like-btn-${index}`);
+    likeBtn.addEventListener('click', () => {
+      if (!userStatus.liked) {
+        userStatus.liked = true;
+        localStorage.setItem(`video-${index}`, JSON.stringify(userStatus));
+        document.getElementById(`likes-${index}`).innerText = video.likes + 1;
+        likeBtn.disabled = true;
+      }
+    });
   });
-}
-
-// Functions to update views and likes
-function addView(index) {
-  videoData[index].views++;
-  document.getElementById(`views-${index}`).innerText = videoData[index].views;
-}
-
-function addLike(index) {
-  videoData[index].likes++;
-  document.getElementById(`likes-${index}`).innerText = videoData[index].likes;
 }
 
 // Initial render
